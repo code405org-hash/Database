@@ -6,20 +6,22 @@
 <link rel="shortcut icon" href="https://i.postimg.cc/K86WppBD/fav.jpg" type="image/png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://script.google.com https://*.googleapis.com https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --bg:#020617;
-  --text:#e5e7eb;
-  --muted:#94a3b8;
-  --border:rgba(255,255,255,.12);
+  --bg:#000000;
+  --text:#ffffff;
+  --muted:#999999;
+  --border:rgba(255,255,255,.2);
 }
 
 *{box-sizing:border-box}
 
 body{
   margin:0;
-  height:100vh;
+  min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -37,18 +39,62 @@ body{
   align-items:center;
 }
 
+.header-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
 h1{
-  margin:8px 0 64px;
+  margin:0;
   font-size:36px;
   font-weight:800;
   color:#fff;
+  text-align:center;
+}
+
+/* ===== Search Icon Animation ===== */
+.search-title-icon {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.search-title-icon:hover {
+  transform: scale(1.1);
+}
+
+.search-title-icon::before {
+  content:"";
+  width:20px;
+  height:20px;
+  border:3px solid #fff;
+  border-radius:50%;
+  position:absolute;
+  left:5px;
+  top:5px;
+}
+
+.search-title-icon::after {
+  content:"";
+  width:10px;
+  height:3px;
+  background:#fff;
+  position:absolute;
+  transform:rotate(45deg);
+  right:3px;
+  bottom:8px;
+  border-radius:2px;
 }
 
 /* ===== Loader ===== */
 .loading{
   width:60px;height:60px;position:relative;margin:25px auto
 }
-.d1,.d2{border:5px solid #6c757d;border-radius:50px}
+.d1,.d2{border:5px solid #fff;border-radius:50px}
 .d1{
   width:55px;height:55px;position:absolute;
   border-left-color:transparent;
@@ -65,7 +111,7 @@ h1{
 
 .loading-text{
   display:none;
-  color:#94a3b8;
+  color:#999;
   font-size:13px;
   margin-top:8px;
 }
@@ -84,17 +130,18 @@ h1{
   max-width:540px;
   height:56px;
   border-radius:40px;
-  background:rgba(255,255,255,.08);
-  backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
   position:relative;
-  transition:.3s;
-}
-.search-wrapper:focus-within{
-  transform:translateY(-2px);
-  background:rgba(255,255,255,.12);
+  transition:all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
+.search-wrapper:hover,
+.search-wrapper:focus-within {
+  background:rgba(255,255,255,.08);
+  box-shadow: 0 0 20px rgba(255,255,255,0.2);
+}
 
 .search-wrapper input{
   width:100%;
@@ -113,6 +160,11 @@ h1{
   top:50%;
   transform:translateY(-50%);
   width:26px;height:26px;
+  cursor:pointer;
+  transition:.3s;
+}
+.search-icon:hover{
+  transform:translateY(-50%) scale(1.1);
 }
 .search-icon::before{
   content:"";
@@ -129,6 +181,27 @@ h1{
   transform:rotate(45deg);
   right:-2px;bottom:2px;
   border-radius:2px;
+}
+
+/* ===== Floating Search Bar ===== */
+.search-wrapper.floating {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  height: 48px;
+  z-index: 1000;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.8);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.search-wrapper.floating.search-focused {
+  height: 56px;
+  max-width: 540px;
+  background: rgba(0,0,0,0.9);
 }
 
 /* ===== Results ===== */
@@ -151,27 +224,38 @@ table{
 th,td{
   padding:12px;
   font-size:14px;
+  text-align:right;
 }
-th{color:#a7f3d0}
+th{color:#fff; font-weight:bold; border-bottom: 2px solid #fff;}
 tbody tr{
   border-bottom:1px solid var(--border);
 }
 tbody tr:hover{
-  background:rgba(255,255,255,.06);
+  background:rgba(255,255,255,.1);
+}
+
+.highlight {
+  background-color: #fff;
+  color: #000;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: bold;
 }
 
 .badge{
   padding:4px 10px;
   border-radius:999px;
   font-size:12px;
-  background:rgba(34,197,94,.15);
-  color:#22c55e;
+  background:rgba(255,255,255,.15);
+  color:#fff;
+  border: 1px solid rgba(255,255,255,.2);
 }
 
 .empty{
   display:none;
   text-align:center;
   color:var(--muted);
+  padding: 40px 0;
 }
 
 /* Disable text selection where needed */
@@ -181,11 +265,113 @@ tbody tr:hover{
   -ms-user-select:none;
 }
 
-/* ===== Social Icons ===== */
+/* ===== Loading Grid ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(12rem, 1fr));
+  gap: 0.2rem;
+  margin: 30px 0;
+  max-width: 900px;
+  width: 100%;
+}
+
+.cell {
+  min-height: 2.5rem;
+  position: relative;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+}
+
+.cell:before {
+  content: "";
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  bottom: 0.4rem;
+  left: 0.4rem;
+  border-radius: 1rem;
+  background: linear-gradient(
+      to right,
+      transparent 0,
+      transparent 30%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 70%,
+      transparent 100%
+    )
+    rgba(150, 150, 150, 0.2);
+  background-size: 1000px 100px;
+  background-position: center left;
+  animation: content-placeholder 1.5s ease infinite;
+}
+
+@keyframes content-placeholder {
+  from {
+    background-position: center right;
+  }
+  to {
+    background-position: center left;
+  }
+}
+
+.cell {
+  animation: cell-animation 1.5s ease infinite;
+}
+
+.cell:nth-child(-n + 5) {
+  display: grid;
+  place-items: center;
+  animation: none;
+  letter-spacing: 0.2rem;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  opacity: 0.8;
+  background: transparent;
+}
+
+.cell:nth-child(-n + 5):before {
+  display: none;
+}
+
+.cell:nth-child(1) { content: "ID"; }
+.cell:nth-child(2) { content: "Name"; }
+.cell:nth-child(3) { content: "Phone"; }
+.cell:nth-child(4) { content: "Device"; }
+.cell:nth-child(5) { content: "Status"; }
+
+.cell:nth-child(n + 6):nth-child(-n + 10) {
+  animation-delay: 0.2s;
+  opacity: 0.4;
+}
+
+.cell:nth-child(n + 11):nth-child(-n + 15) {
+  animation-delay: 0.4s;
+  opacity: 0.2;
+}
+
+.cell:nth-child(n + 16):nth-child(-n + 20) {
+  animation-delay: 0.6s;
+  opacity: 0.1;
+}
+
+@keyframes cell-animation {
+  from {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(17%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* ===== Footer ===== */
 .footer{
   margin-top:50px;
   display:flex;
   gap:20px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .social-link{
@@ -200,18 +386,105 @@ tbody tr:hover{
 }
 .social-link:hover{
   transform:translateY(-3px);
-  background:rgba(59,130,246,.2);
+  background:rgba(255,255,255,.15);
 }
 
 .social-link svg{
   width:22px;
   height:22px;
-  fill:#e5e7eb;
+  fill:#fff;
   transition:.3s;
 }
 .social-link:hover svg{
-  fill:#3b82f6;
+  fill:#fff;
   transform:scale(1.15);
+}
+
+.copyright {
+  margin-top: 20px;
+  color: #999;
+  font-size: 12px;
+  text-align: center;
+  width: 100%;
+}
+
+/* ===== Mobile Responsive ===== */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+  
+  h1 {
+    font-size: 28px;
+  }
+  
+  .header-wrapper {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+  
+  .search-title-icon {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .search-wrapper {
+    height: 50px;
+  }
+  
+  .search-wrapper.floating {
+    width: 95%;
+    height: 44px;
+  }
+  
+  .search-wrapper.floating.search-focused {
+    height: 50px;
+  }
+  
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  th, td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  
+  .grid {
+    grid-template-columns: repeat(5, minmax(6rem, 1fr));
+  }
+  
+  .cell:nth-child(-n + 5) {
+    font-size: 1rem;
+    letter-spacing: 0.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 24px;
+  }
+  
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .cell:nth-child(3),
+  .cell:nth-child(4),
+  .cell:nth-child(5) {
+    display: none;
+  }
+  
+  .footer {
+    gap: 15px;
+  }
+  
+  .social-link {
+    width: 40px;
+    height: 40px;
+  }
 }
 </style>
 </head>
@@ -219,24 +492,53 @@ tbody tr:hover{
 <body>
 
 <div class="container">
-  <h1>DATABASE SEARCH</h1>
+  <div class="header-wrapper">
+    <h1>DATABASE SEARCH</h1>
+    <div class="search-title-icon" onclick="scrollToSearch()"></div>
+  </div>
 
   <div class="search-box">
-    <div class="search-wrapper">
-      <input id="q" placeholder="Search..." onkeyup="autoSearch(event)">
-      <div class="search-icon"></div>
+    <div class="search-wrapper" id="searchWrapper">
+      <input id="q" placeholder="Search..." onkeyup="autoSearch(event)" onfocus="onSearchFocus()" onblur="onSearchBlur()">
+      <div class="search-icon" onclick="search()"></div>
     </div>
-
 
     <div id="loader" class="loading" style="display:none">
       <div class="d1"></div><div class="d2"></div>
     </div>
     <div id="loading-text" class="loading-text">Connecting to API...</div>
 
+    <!-- Loading Grid Placeholder -->
+    <div id="loadingGrid" class="grid" style="display:none">
+      <div class="cell">ID</div>
+      <div class="cell">Name</div>
+      <div class="cell">Phone</div>
+      <div class="cell">Device</div>
+      <div class="cell">Status</div>
+      
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+    </div>
+
     <div id="results-panel" class="results-panel no-select">
       <table id="table">
         <thead>
-          <tr><th>ID</th><th>Name</th><th>Phone</th><th>Device</th></tr>
+          <tr><th>ID</th><th>Name</th><th>Phone</th><th>Device</th><th>Status</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -260,49 +562,117 @@ tbody tr:hover{
     <a class="social-link" href="https://instagram.com" target="_blank" rel="noopener noreferrer">
       <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 2 .3 2.5.5.6.2 1 .5 1.5 1s.8.9 1 1.5c.2.5.4 1.3.5 2.5.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.3 2-.5 2.5-.2.6-.5 1-1 1.5s-.9.8-1.5 1c-.5.2-1.3.4-2.5.5-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-2-.3-2.5-.5-.6-.2-1-.5-1.5-1s-.8-.9-1-1.5c-.2-.5-.4-1.3-.5-2.5-.1-1.2-.1-1.6-.1-4.8s0-3.6.1-4.8c.1-1.2.3-2 .5-2.5.2-.6.5-1 1-1.5s.9-.8 1.5-1c.5-.2 1.3-.4 2.5-.5 1.2-.1 1.6-.1 4.8-.1z"/></svg>
     </a>
+    
+    <div class="copyright">
+      © 2026 MOSTAFA. All rights reserved.
+    </div>
   </div>
 </div>
 
 <script>
 const API="https://script.google.com/macros/s/AKfycbxtKQvd0oc6FJUxhPw_wQPMpbi-6lgkOkO5YSvafh_lnVZht4z-hjMuRIjpspyQRX9O/exec";
+let lastSearchQuery = "";
 
 async function search(){
-
   const q=qInput.value.trim();
-  if(!q)return;
+  if(!q) return;
+  
+  lastSearchQuery = q;
+  
+  // Hide previous results and show loading
+  resultsPanel.classList.remove("show");
+  loadingGrid.style.display = "none";
   loader.style.display="block";
   loadingText.style.display="block";
-  resultsPanel.classList.add("show");
+  
+  // Make search bar floating
+  searchWrapper.classList.add("floating");
+  
+  try {
+    const res=await fetch(`${API}?q=${encodeURIComponent(q)}`);
+    if (!res.ok) throw new Error('Network response was not ok');
+    const data=await res.json();
+    tbody.innerHTML="";
 
-  const res=await fetch(`${API}?q=${encodeURIComponent(q)}`);
-  const data=await res.json();
-  tbody.innerHTML="";
-
-  if(!data.length){
+    if(!data.length){
+      empty.style.display="block";
+      table.style.display="none";
+      resultsPanel.classList.add("show");
+    }else{
+      data.forEach(r=>{
+        // Highlight search term in results
+        const idText = highlightText(r.ID.toString(), q);
+        const nameText = highlightText(r.name, q);
+        const phoneText = highlightText(r.phone, q);
+        const deviceText = highlightText(r.device || "-", q);
+        
+        tbody.innerHTML+=`<tr>
+          <td>${idText}</td>
+          <td>${nameText}</td>
+          <td>${phoneText}</td>
+          <td><span class="badge">${deviceText}</span></td>
+          <td><span class="badge">Active</span></td>
+        </tr>`;
+      });
+      table.style.display="table";
+      empty.style.display="none";
+      resultsPanel.classList.add("show");
+    }
+  } catch (error) {
+    console.error('Search failed:', error);
+    empty.textContent = "Error occurred during search. Please try again.";
     empty.style.display="block";
     table.style.display="none";
-  }else{
-    data.forEach(r=>{
-      tbody.innerHTML+=`<tr>
-        <td>${r.ID}</td>
-        <td>${r.name}</td>
-        <td>${r.phone}</td>
-        <td><span class="badge">${r.device||"-"}</span></td>
-      </tr>`;
-    });
-    table.style.display="table";
-    empty.style.display="none";
+    resultsPanel.classList.add("show");
+  } finally {
+    loader.style.display="none";
+    loadingText.style.display="none";
+    loadingGrid.style.display = "none";
   }
-  loader.style.display="none";
-  loadingText.style.display="none";
 }
 
-function autoSearch(e){if(e.key==="Enter")search()}
+// Function to highlight search terms
+function highlightText(text, searchTerm) {
+  if (!searchTerm) return text;
+  
+  const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(regex, '<span class="highlight">$1</span>');
+}
+
+function autoSearch(e){
+  if(e.key==="Enter"){
+    search();
+  }
+}
+
+function onSearchFocus() {
+  searchWrapper.classList.add("search-focused");
+}
+
+function onSearchBlur() {
+  searchWrapper.classList.remove("search-focused");
+}
+
+function scrollToSearch() {
+  qInput.focus();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// Make search bar float when scrolling
+window.addEventListener('scroll', function() {
+  if (window.scrollY > 100) {
+    searchWrapper.classList.add('floating');
+  } else if (!qInput.value.trim() && window.scrollY <= 100) {
+    searchWrapper.classList.remove('floating');
+  }
+});
 
 const qInput=document.getElementById("q"),
 loader=document.getElementById("loader"),
 loadingText=document.getElementById("loading-text"),
+loadingGrid=document.getElementById("loadingGrid"),
 resultsPanel=document.getElementById("results-panel"),
+searchWrapper=document.getElementById("searchWrapper"),
 table=document.getElementById("table"),
 tbody=table.querySelector("tbody"),
 empty=document.getElementById("empty");
@@ -337,8 +707,17 @@ empty=document.getElementById("empty");
       empty.style.display = 'none';
       loader.style.display = 'none';
       loadingText.style.display = 'none';
+      loadingGrid.style.display = 'none';
+      
+      // Remove floating when search is empty and at top
+      if (window.scrollY <= 100) {
+        searchWrapper.classList.remove('floating');
+      }
     }
   });
+  
+  // Fix for search icon click
+  document.querySelector('.search-icon').addEventListener('click', search);
 })();
 
 </script>
